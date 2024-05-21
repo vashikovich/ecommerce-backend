@@ -5,10 +5,12 @@ import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     ProductModule,
@@ -17,4 +19,4 @@ import { OrderModule } from './order/order.module';
     OrderModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

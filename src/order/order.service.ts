@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseAdminService } from '../firebase/firebase-admin.service';
 import { Order } from './entities/order.entity';
+import { CreateOrderInput } from './dto/create-order.input';
 
 @Injectable()
 export class OrderService {
-  private db;
+  private db: FirebaseFirestore.Firestore;
 
   constructor(private firebaseAdminService: FirebaseAdminService) {
     this.db = this.firebaseAdminService.getFirestore();

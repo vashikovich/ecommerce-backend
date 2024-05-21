@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseAdminService } from '../firebase/firebase-admin.service';
 import { Cart } from './entities/cart.entity';
+import { CreateCartInput } from './dto/create-cart.input';
 
 @Injectable()
 export class CartService {
-  private db;
+  private db: FirebaseFirestore.Firestore;
 
   constructor(private firebaseAdminService: FirebaseAdminService) {
     this.db = this.firebaseAdminService.getFirestore();

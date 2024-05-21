@@ -1,6 +1,18 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
+export class ImageUrls {
+  @Field()
+  thumbnail: string;
+
+  @Field()
+  small: string;
+
+  @Field()
+  original: string;
+}
+
+@ObjectType()
 export class Product {
   @Field()
   id: string;
@@ -31,16 +43,4 @@ export class Product {
 
   @Field()
   updatedAt: Date;
-}
-
-@ObjectType()
-export class ImageUrls {
-  @Field()
-  thumbnail: string;
-
-  @Field()
-  small: string;
-
-  @Field()
-  original: string;
 }

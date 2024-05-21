@@ -1,0 +1,90 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ImageUrls {
+  thumbnail: String!
+  small: String!
+  original: String!
+}
+
+type Product {
+  id: String!
+  name: String!
+  brand: String
+  price: Float!
+  size: String!
+  ingredients: String!
+  origin: String!
+  imageUrls: ImageUrls!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type User {
+  id: String!
+  email: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type CartItem {
+  productId: String!
+  quantity: Float!
+}
+
+type Cart {
+  id: String!
+  items: [CartItem!]!
+  userId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Order {
+  id: String!
+  userId: String!
+  items: [CartItem!]!
+  totalAmount: Float!
+  status: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Query {
+  product(id: String!): Product!
+  users: [User!]!
+  user(id: String!): User!
+  cart(id: String!): Cart!
+  cartsByUser(userId: String!): [Cart!]!
+  order(id: String!): Order!
+  ordersByUser(userId: String!): [Order!]!
+}
+
+type Mutation {
+  createUser(email: String!): User!
+  createCart(cart: CreateCartInput!): Cart!
+  createOrder(order: CreateOrderInput!): Order!
+}
+
+input CreateCartInput {
+  userId: String!
+  items: [CartItemInput!]!
+}
+
+input CartItemInput {
+  productId: String!
+  quantity: Float!
+}
+
+input CreateOrderInput {
+  userId: String!
+  items: [CartItemInput!]!
+  totalAmount: Float!
+  status: String!
+}
