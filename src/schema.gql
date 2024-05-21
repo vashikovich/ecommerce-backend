@@ -58,6 +58,7 @@ type Order {
 
 type Query {
   product(id: String!): Product!
+  searchProducts(searchTerm: String!): [Product!]!
   users: [User!]!
   user(id: String!): User!
   cart(id: String!): Cart!

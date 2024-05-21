@@ -10,4 +10,9 @@ export class ProductResolver {
   async product(@Args('id') id: string) {
     return this.productService.getProductById(id);
   }
+
+  @Query(() => [Product])
+  async searchProducts(@Args('searchTerm') searchTerm: string) {
+    return this.productService.searchProducts(searchTerm);
+  }
 }
