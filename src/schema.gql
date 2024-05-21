@@ -26,12 +26,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type User {
-  uid: String!
-  email: String!
-  displayName: String
-}
-
 type CartItem {
   productId: String!
   quantity: Float!
@@ -55,11 +49,16 @@ type Order {
   updatedAt: DateTime!
 }
 
+type User {
+  uid: String!
+  email: String!
+  displayName: String
+}
+
 type Query {
+  currentUser: User!
   product(id: String!): Product!
   searchProducts(searchTerm: String!): [Product!]!
-  users: [User!]!
-  user(id: String!): User!
   cart(id: String!): Cart!
   cartsByUser(userId: String!): [Cart!]!
   order(id: String!): Order!
@@ -70,10 +69,13 @@ type Mutation {
   register(email: String!, password: String!): User!
   login(email: String!, password: String!): String!
   verifyToken(token: String!): User!
-  currentUser: User!
-  createUser(email: String!): User!
+  updateProfile(input: UpdateProfileInput!): User!
   createCart(cart: CreateCartInput!): Cart!
   createOrder(order: CreateOrderInput!): Order!
+}
+
+input UpdateProfileInput {
+  displayName: String!
 }
 
 input CreateCartInput {

@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { ProductModule } from './product/product.module';
-import { UserModule } from './user/user.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -18,9 +17,8 @@ import { AuthModule } from './auth/auth.module';
         return { token };
       },
     }),
-    AuthModule,
-    ProductModule,
     UserModule,
+    ProductModule,
     CartModule,
     OrderModule,
   ],

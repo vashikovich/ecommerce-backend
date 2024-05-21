@@ -1,33 +1,63 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { FirebaseService } from '../firebase/firebase.service';
-import { User } from './entities/user.entity';
+import { Auth } from 'firebase-admin/lib/auth/auth';
+import { UpdateProfileInput } from './dto/update-profile.input';
 
 @Injectable()
 export class UserService {
-  private db;
+  private auth: Auth;
 
   constructor(private firebaseAdminService: FirebaseService) {
-    this.db = this.firebaseAdminService.getFirestore();
+    this.auth = firebaseAdminService.getAuth();
   }
 
-  async createUser(email: string): Promise<User> {
-    const userRef = this.db.collection('users').doc();
-    const user = {
-      uid: userRef.uid,
-      id: userRef.id,
-      email,
+  async register(email: string, password: string) {
+    try {
+      const userCredential = await this.auth.createUser({
+        email,
+        password,
+      });
+      return userCredential;
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  async login(email: string, password: string) {
+    try {
+      const user = await this.auth.getUserByEmail(email);
+      const token = await this.auth.createCustomToken(user.uid);
+      return { user, token };
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  async verifyToken(token: string) {
+    try {
+      const decodedToken = await this.auth.verifyIdToken(token);
+      return decodedToken;
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
+  }
+
+  async validateToken(token: string) {
+    if (!token) {
+      throw new UnauthorizedException('No token provided');
+    }
+    const decodedToken = await this.verifyToken(token);
+    return {
+      uid: decodedToken.uid,
+      email: decodedToken.email,
     };
-    await userRef.set(user);
-    return user;
   }
 
-  async getUserById(id: string): Promise<User> {
-    const doc = await this.db.collection('users').doc(id).get();
-    return { id: doc.id, ...doc.data() } as User;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    const snapshot = await this.db.collection('users').get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
+  async updateProfile(uid: string, input: UpdateProfileInput) {
+    try {
+      return await this.auth.updateUser(uid, input);
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
+    }
   }
 }

@@ -32,8 +32,4 @@ export class FirebaseService {
   getAuth() {
     return this.auth;
   }
-
-  async verifyIdToken(token: string) {
-    return admin.auth().verifyIdToken(token);
-  }
 }

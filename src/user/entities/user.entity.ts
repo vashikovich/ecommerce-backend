@@ -1,3 +1,4 @@
+// src/auth/user.entity.ts
 import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
