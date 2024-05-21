@@ -1,22 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { FirebaseAdminService } from '../firebase/firebase-admin.service';
+import { FirebaseService } from '../firebase/firebase.service';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
   private db;
 
-  constructor(private firebaseAdminService: FirebaseAdminService) {
+  constructor(private firebaseAdminService: FirebaseService) {
     this.db = this.firebaseAdminService.getFirestore();
   }
 
   async createUser(email: string): Promise<User> {
     const userRef = this.db.collection('users').doc();
     const user = {
+      uid: userRef.uid,
       id: userRef.id,
       email,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
     await userRef.set(user);
     return user;
@@ -29,6 +28,6 @@ export class UserService {
 
   async getAllUsers(): Promise<User[]> {
     const snapshot = await this.db.collection('users').get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as User);
   }
 }

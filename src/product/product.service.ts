@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FirebaseAdminService } from '../firebase/firebase-admin.service';
+import { FirebaseService } from '../firebase/firebase.service';
 import { Product } from './entities/product.entity';
 import { AlgoliaService } from 'src/algolia/algolia.service';
 
@@ -8,7 +8,7 @@ export class ProductService {
   private db: FirebaseFirestore.Firestore;
 
   constructor(
-    private firebaseAdminService: FirebaseAdminService,
+    private firebaseAdminService: FirebaseService,
     private algoliaService: AlgoliaService
   ) {
     this.db = this.firebaseAdminService.getFirestore();
