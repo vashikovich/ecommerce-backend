@@ -5,16 +5,16 @@ import { User } from './entities/user.entity';
 
 @Resolver(() => User)
 export class UserResolver {
-  constructor(private readonly authService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Mutation(() => User)
   async verifyToken(@Args('token') token: string) {
-    return this.authService.verifyToken(token);
+    return this.userService.verifyToken(token);
   }
 
   @Query(() => User)
   async currentUser(@Context('token') token: string) {
-    const user = await this.authService.validateToken(token);
+    const user = await this.userService.validateToken(token);
     return user;
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Cart } from './entities/cart.entity';
-import { CreateCartInput } from './dto/create-cart.input';
 
 @Injectable()
 export class CartService {
@@ -11,28 +10,58 @@ export class CartService {
     this.db = this.firebaseAdminService.getFirestore();
   }
 
-  async createCart(cart: CreateCartInput): Promise<Cart> {
+  async createCartIfNotExist(userId: string): Promise<Cart> {
     const cartRef = this.db.collection('carts').doc();
-    const newCart = {
-      id: cartRef.id,
-      ...cart,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const newCart: Cart = {
+      userId,
+      items: [],
     };
     await cartRef.set(newCart);
-    return newCart as Cart;
+    return newCart;
   }
 
-  async getCartById(id: string): Promise<Cart> {
-    const doc = await this.db.collection('carts').doc(id).get();
-    return { id: doc.id, ...doc.data() } as Cart;
+  async getCartByUserId(userId: string): Promise<Cart> {
+    const doc = await this.db.collection('carts').doc(userId).get();
+    return doc.data() as Cart;
   }
 
-  async getCartsByUserId(userId: string): Promise<Cart[]> {
-    const snapshot = await this.db
-      .collection('carts')
-      .where('userId', '==', userId)
-      .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Cart);
+  async addProductToCart(userId: string, productId: string): Promise<Cart> {
+    const collection = this.db.collection('carts');
+    const doc = await collection.doc(userId).get();
+
+    let cart: Cart;
+    if (doc.exists) {
+      cart = doc.data() as Cart;
+    } else {
+      cart = await this.createCartIfNotExist(userId);
+    }
+
+    const item = cart.items.find((i) => i.productId === productId);
+    if (item) {
+      item.quantity++;
+    } else {
+      cart.items.push({ productId, quantity: 1 });
+    }
+
+    await collection.doc(userId).set(cart);
+
+    return cart;
+  }
+
+  async changeCartProductQuantity(
+    userId: string,
+    productId: string,
+    quantity: number,
+  ): Promise<Cart> {
+    const collection = this.db.collection('carts');
+    const doc = await collection.doc(userId).get();
+
+    const cart = doc.data() as Cart;
+    const item = cart.items.find((i) => i.productId === productId);
+    item.quantity = quantity;
+
+    await collection.doc(userId).set(cart);
+
+    return cart;
   }
 }

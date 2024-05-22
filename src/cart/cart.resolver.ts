@@ -1,24 +1,41 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Context, Args, Mutation } from '@nestjs/graphql';
 import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
-import { CreateCartInput } from './dto/create-cart.input';
+import { UserService } from 'src/user/user.service.js';
 
 @Resolver(() => Cart)
 export class CartResolver {
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    private userService: UserService,
+  ) {}
 
   @Query(() => Cart)
-  async cart(@Args('id') id: string) {
-    return this.cartService.getCartById(id);
-  }
-
-  @Query(() => [Cart])
-  async cartsByUser(@Args('userId') userId: string) {
-    return this.cartService.getCartsByUserId(userId);
+  async cart(@Context('token') token: string) {
+    const user = await this.userService.validateToken(token);
+    return this.cartService.getCartByUserId(user.uid);
   }
 
   @Mutation(() => Cart)
-  async createCart(@Args('cart') cart: CreateCartInput) {
-    return this.cartService.createCart(cart);
+  async addProductToCart(
+    @Context('token') token: string,
+    @Args('productId') productId: string,
+  ) {
+    const user = await this.userService.validateToken(token);
+    return await this.cartService.addProductToCart(user.uid, productId);
+  }
+
+  @Mutation(() => Cart)
+  async changeCartProductQuantity(
+    @Context('token') token: string,
+    @Args('productId') productId: string,
+    @Args('quantity') quanity: number,
+  ) {
+    const user = await this.userService.validateToken(token);
+    return await this.cartService.changeCartProductQuantity(
+      user.uid,
+      productId,
+      quanity,
+    );
   }
 }

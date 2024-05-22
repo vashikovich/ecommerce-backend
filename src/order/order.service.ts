@@ -29,7 +29,10 @@ export class OrderService {
   }
 
   async getOrdersByUserId(userId: string): Promise<Order[]> {
-    const snapshot = await this.db.collection('orders').where('userId', '==', userId).get();
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+    const snapshot = await this.db
+      .collection('orders')
+      .where('userId', '==', userId)
+      .get();
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Order);
   }
 }
