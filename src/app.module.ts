@@ -6,6 +6,7 @@ import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
@@ -13,10 +14,10 @@ import { UserModule } from './user/user.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       context: ({ req }) => {
-        const token = req.headers.authorization?.split(' ')[1];
-        return { token };
+        return { req };
       },
     }),
+    AuthModule,
     UserModule,
     ProductModule,
     CartModule,

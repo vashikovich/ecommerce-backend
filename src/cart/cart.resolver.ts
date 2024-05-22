@@ -1,7 +1,11 @@
-import { Resolver, Query, Context, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
+import { UseGuards } from '@nestjs/common';
+import { GraphqlAuthGuard } from 'src/auth/guards/graphql-auth.guard';
+import { CurrentUser } from 'src/user/decorators/user.decorator';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -11,29 +15,29 @@ export class CartResolver {
   ) {}
 
   @Query(() => Cart)
-  async cart(@Context('token') token: string) {
-    const user = await this.userService.validateToken(token);
-    return this.cartService.getCartByUserId(user.uid);
+  @UseGuards(GraphqlAuthGuard)
+  async cart(@CurrentUser() user: User) {
+    return this.cartService.getCartByUserId(user.id);
   }
 
   @Mutation(() => Cart)
+  @UseGuards(GraphqlAuthGuard)
   async addProductToCart(
-    @Context('token') token: string,
+    @CurrentUser() user: User,
     @Args('productId') productId: string,
   ) {
-    const user = await this.userService.validateToken(token);
-    return await this.cartService.addProductToCart(user.uid, productId);
+    return await this.cartService.addProductToCart(user.id, productId);
   }
 
   @Mutation(() => Cart)
+  @UseGuards(GraphqlAuthGuard)
   async changeCartProductQuantity(
-    @Context('token') token: string,
+    @CurrentUser() user: User,
     @Args('productId') productId: string,
     @Args('quantity') quanity: number,
   ) {
-    const user = await this.userService.validateToken(token);
     return await this.cartService.changeCartProductQuantity(
-      user.uid,
+      user.id,
       productId,
       quanity,
     );

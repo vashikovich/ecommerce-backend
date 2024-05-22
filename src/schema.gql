@@ -30,7 +30,7 @@ type Cart {
 }
 
 type User {
-  uid: String!
+  id: String!
   email: String!
   displayName: String
 }
@@ -60,10 +60,14 @@ type Query {
 }
 
 type Mutation {
-  verifyToken(token: String!): User!
+  updateUser(input: UpdateUserInput!): User!
   addProductToCart(productId: String!): Cart!
   changeCartProductQuantity(productId: String!, quantity: Float!): Cart!
   createOrder(order: CreateOrderInput!): Order!
+}
+
+input UpdateUserInput {
+  displayName: String!
 }
 
 input CreateOrderInput {

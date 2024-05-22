@@ -1,32 +1,50 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { FirebaseService } from '../firebase/firebase.service';
-import { Auth } from 'firebase-admin/lib/auth/auth';
+import { Injectable } from '@nestjs/common';
+import { User } from './entities/user.entity';
+import * as bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import { FirebaseService } from 'src/firebase/firebase.service';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UserService {
-  private auth: Auth;
+  private collection: FirebaseFirestore.CollectionReference;
 
   constructor(private firebaseAdminService: FirebaseService) {
-    this.auth = firebaseAdminService.getAuth();
+    const db = this.firebaseAdminService.getFirestore();
+    this.collection = db.collection('users');
   }
 
-  async verifyToken(token: string) {
-    try {
-      const decodedToken = await this.auth.verifyIdToken(token);
-      return decodedToken;
-    } catch (error) {
-      throw new UnauthorizedException(error.message);
-    }
-  }
-
-  async validateToken(token: string) {
-    if (!token) {
-      throw new UnauthorizedException('No token provided');
-    }
-    const decodedToken = await this.verifyToken(token);
-    return {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
+  async createUser(email: string, password: string): Promise<User> {
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user: User = {
+      id: uuidv4(),
+      email,
+      passwordHash,
     };
+    const doc = this.collection.doc(user.id);
+    await doc.set(user);
+    return user;
+  }
+
+  async findByEmail(email: string): Promise<User | undefined> {
+    const query = await this.collection.where('email', '==', email).get();
+    return query.docs.map((doc) => doc.data() as User)[0];
+  }
+
+  async findById(id: string): Promise<User | undefined> {
+    const doc = await this.collection.doc(id).get();
+    return doc.data() as User;
+  }
+
+  async updateUser(
+    id: string,
+    input: UpdateUserInput,
+  ): Promise<User | undefined> {
+    const docRef = this.collection.doc(id);
+    const userDoc = await docRef.get();
+    const userData = userDoc.data();
+    const user = { ...userData, ...input } as User;
+    await docRef.set(user);
+    return user;
   }
 }
