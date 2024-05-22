@@ -16,27 +16,23 @@ type Product {
   size: String!
   ingredients: String!
   origin: String!
-  imageUrls: ImageUrls!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  imageUrls: [ImageUrls!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type CartItem {
   productId: String!
-  quantity: Float!
+  quantity: Int!
 }
 
 type Cart {
-  id: String!
-  items: [CartItem!]!
   userId: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  items: [CartItem!]!
+}
+
+type User {
+  uid: String!
+  email: String!
+  displayName: String
 }
 
 type Order {
@@ -49,48 +45,29 @@ type Order {
   updatedAt: DateTime!
 }
 
-type User {
-  uid: String!
-  email: String!
-  displayName: String
-}
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Query {
   currentUser: User!
   product(id: String!): Product!
   searchProducts(searchTerm: String!): [Product!]!
-  cart(id: String!): Cart!
-  cartsByUser(userId: String!): [Cart!]!
+  cart: Cart!
   order(id: String!): Order!
   ordersByUser(userId: String!): [Order!]!
 }
 
 type Mutation {
-  register(email: String!, password: String!): User!
-  login(email: String!, password: String!): String!
   verifyToken(token: String!): User!
-  updateProfile(input: UpdateProfileInput!): User!
-  createCart(cart: CreateCartInput!): Cart!
+  addProductToCart(productId: String!): Cart!
+  changeCartProductQuantity(productId: String!, quantity: Float!): Cart!
   createOrder(order: CreateOrderInput!): Order!
-}
-
-input UpdateProfileInput {
-  displayName: String!
-}
-
-input CreateCartInput {
-  userId: String!
-  items: [CartItemInput!]!
-}
-
-input CartItemInput {
-  productId: String!
-  quantity: Float!
 }
 
 input CreateOrderInput {
   userId: String!
-  items: [CartItemInput!]!
   totalAmount: Float!
   status: String!
 }

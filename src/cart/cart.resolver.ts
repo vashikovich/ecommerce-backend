@@ -1,7 +1,7 @@
 import { Resolver, Query, Context, Args, Mutation } from '@nestjs/graphql';
 import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
-import { UserService } from 'src/user/user.service.js';
+import { UserService } from 'src/user/user.service';
 
 @Resolver(() => Cart)
 export class CartResolver {
