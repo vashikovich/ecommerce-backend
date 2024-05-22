@@ -12,7 +12,7 @@ export class AlgoliaService {
       process.env.ALGOLIA_APP_ID,
       process.env.ALGOLIA_API_KEY,
     );
-    this.index = this.client.initIndex('products');
+    this.index = this.client.initIndex('e-commerce_products');
   }
 
   async searchProducts(searchTerm: string) {

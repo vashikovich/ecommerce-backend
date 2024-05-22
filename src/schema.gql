@@ -14,8 +14,8 @@ type Product {
   brand: String
   price: Float!
   size: String!
-  ingredients: String!
-  origin: String!
+  ingredients: String
+  origin: String
   imageUrls: [ImageUrls!]!
 }
 

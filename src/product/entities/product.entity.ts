@@ -29,10 +29,10 @@ export class Product {
   @Field()
   size: string;
 
-  @Field()
-  ingredients: string;
+  @Field({ nullable: true })
+  ingredients?: string;
 
-  @Field()
+  @Field({ nullable: true })
   origin: string;
 
   @Field(() => [ImageUrls])
