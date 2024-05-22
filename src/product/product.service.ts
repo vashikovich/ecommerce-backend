@@ -9,7 +9,7 @@ export class ProductService {
 
   constructor(
     private firebaseAdminService: FirebaseService,
-    private algoliaService: AlgoliaService
+    private algoliaService: AlgoliaService,
   ) {
     this.db = this.firebaseAdminService.getFirestore();
   }
@@ -21,6 +21,6 @@ export class ProductService {
 
   async searchProducts(searchTerm: string): Promise<Product[]> {
     const searchResults = await this.algoliaService.searchProducts(searchTerm);
-    return searchResults as Product[];
+    return searchResults;
   }
 }

@@ -1,22 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import algoliasearch from 'algoliasearch';
+import algoliasearch, { SearchClient, SearchIndex } from 'algoliasearch';
+import { Product } from 'src/product/entities/product.entity.js';
 
 @Injectable()
 export class AlgoliaService {
-  private client;
-  private index;
+  private client: SearchClient;
+  private index: SearchIndex;
 
   constructor() {
-    this.client = algoliasearch('your-algolia-app-id', 'your-algolia-admin-api-key');
+    this.client = algoliasearch(
+      process.env.ALGOLIA_APP_ID,
+      process.env.ALGOLIA_API_KEY,
+    );
     this.index = this.client.initIndex('products');
   }
 
-  async addProduct(product) {
-    return this.index.saveObject(product, { autoGenerateObjectIDIfNotExist: true });
-  }
-
   async searchProducts(searchTerm: string) {
-    const { hits } = await this.index.search(searchTerm);
+    const { hits } = await this.index.search<Product>(searchTerm);
     return hits;
   }
 }
