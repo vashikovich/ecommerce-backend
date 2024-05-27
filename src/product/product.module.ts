@@ -7,5 +7,6 @@ import { FirebaseModule } from 'src/firebase/firebase.module';
 @Module({
   providers: [ProductResolver, ProductService],
   imports: [FirebaseModule, AlgoliaModule],
+  exports: [ProductService],
 })
 export class ProductModule {}

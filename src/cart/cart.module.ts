@@ -6,5 +6,6 @@ import { FirebaseModule } from 'src/firebase/firebase.module';
 @Module({
   providers: [CartResolver, CartService],
   imports: [FirebaseModule],
+  exports: [CartService],
 })
 export class CartModule {}

@@ -35,20 +35,23 @@ type User {
   displayName: String
 }
 
+type OrderItem {
+  productId: String!
+  name: String!
+  brand: String
+  size: String!
+  imageUrl: String!
+  unitPrice: Float!
+  quantity: Int!
+}
+
 type Order {
   id: String!
   userId: String!
-  items: [CartItem!]!
+  items: [OrderItem!]!
   totalAmount: Float!
   status: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Query {
   currentUser: User!
@@ -56,22 +59,16 @@ type Query {
   searchProducts(searchTerm: String!): [Product!]!
   cart: Cart!
   order(id: String!): Order!
-  ordersByUser(userId: String!): [Order!]!
+  ordersByUser: [Order!]!
 }
 
 type Mutation {
   updateUser(input: UpdateUserInput!): User!
   addProductToCart(productId: String!): Cart!
   changeCartProductQuantity(productId: String!, quantity: Float!): Cart!
-  createOrder(order: CreateOrderInput!): Order!
+  createOrder: Order!
 }
 
 input UpdateUserInput {
   displayName: String!
-}
-
-input CreateOrderInput {
-  userId: String!
-  totalAmount: Float!
-  status: String!
 }
