@@ -5,13 +5,15 @@ import { Cart } from './entities/cart.entity';
 @Injectable()
 export class CartService {
   private db: FirebaseFirestore.Firestore;
+  private collection: FirebaseFirestore.CollectionReference;
 
   constructor(private firebaseAdminService: FirebaseService) {
     this.db = this.firebaseAdminService.getFirestore();
+    this.collection = this.db.collection('carts');
   }
 
   async createCartIfNotExist(userId: string): Promise<Cart> {
-    const cartRef = this.db.collection('carts').doc();
+    const cartRef = this.collection.doc();
     const newCart: Cart = {
       userId,
       items: [],
@@ -21,12 +23,12 @@ export class CartService {
   }
 
   async getCartByUserId(userId: string): Promise<Cart> {
-    const doc = await this.db.collection('carts').doc(userId).get();
+    const doc = await this.collection.doc(userId).get();
     return doc.data() as Cart;
   }
 
   async addProductToCart(userId: string, productId: string): Promise<Cart> {
-    const collection = this.db.collection('carts');
+    const collection = this.collection;
     const doc = await collection.doc(userId).get();
 
     let cart: Cart;
@@ -53,7 +55,7 @@ export class CartService {
     productId: string,
     quantity: number,
   ): Promise<Cart> {
-    const collection = this.db.collection('carts');
+    const collection = this.collection;
     const doc = await collection.doc(userId).get();
 
     const cart = doc.data() as Cart;

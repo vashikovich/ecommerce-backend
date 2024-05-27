@@ -1,7 +1,6 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
-import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import { UseGuards } from '@nestjs/common';
 import { GraphqlAuthGuard } from 'src/auth/guards/graphql-auth.guard';
@@ -9,10 +8,7 @@ import { CurrentUser } from 'src/user/decorators/user.decorator';
 
 @Resolver(() => Cart)
 export class CartResolver {
-  constructor(
-    private cartService: CartService,
-    private userService: UserService,
-  ) {}
+  constructor(private cartService: CartService) {}
 
   @Query(() => Cart)
   @UseGuards(GraphqlAuthGuard)

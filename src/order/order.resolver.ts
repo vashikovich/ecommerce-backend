@@ -1,7 +1,8 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
-import { CreateOrderInput } from './dto/create-order.input';
+import { CurrentUser } from 'src/user/decorators/user.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 @Resolver(() => Order)
 export class OrderResolver {
@@ -13,12 +14,12 @@ export class OrderResolver {
   }
 
   @Query(() => [Order])
-  async ordersByUser(@Args('userId') userId: string) {
-    return this.orderService.getOrdersByUserId(userId);
+  async ordersByUser(@CurrentUser() user: User) {
+    return this.orderService.getOrdersByUserId(user.id);
   }
 
   @Mutation(() => Order)
-  async createOrder(@Args('order') order: CreateOrderInput) {
-    return this.orderService.createOrder(order);
+  async createOrder(@CurrentUser() user: User) {
+    return this.orderService.createOrder(user.id);
   }
 }
