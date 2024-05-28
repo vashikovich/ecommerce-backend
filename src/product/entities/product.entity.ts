@@ -1,7 +1,7 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ImageUrls {
+export class ImageUrl {
   @Field()
   thumbnail: string;
 
@@ -35,6 +35,6 @@ export class Product {
   @Field({ nullable: true })
   origin: string;
 
-  @Field(() => [ImageUrls])
-  imageUrls: ImageUrls[];
+  @Field(() => [ImageUrl])
+  imageUrls: ImageUrl[];
 }
