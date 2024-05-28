@@ -2,7 +2,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type ImageUrls {
+type ImageUrl {
   thumbnail: String!
   small: String!
   original: String!
@@ -14,9 +14,11 @@ type Product {
   brand: String
   price: Float!
   size: String!
+  description: String
   ingredients: String
   origin: String
-  imageUrls: [ImageUrls!]!
+  imageUrls: [ImageUrl!]!
+  categoryIds: [Int!]!
 }
 
 type CartItem {

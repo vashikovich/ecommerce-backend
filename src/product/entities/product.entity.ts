@@ -1,4 +1,4 @@
-import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ImageUrl {
@@ -9,7 +9,7 @@ export class ImageUrl {
   small: string;
 
   @Field()
-  original: string;
+  original?: string;
 }
 
 @ObjectType()
@@ -30,11 +30,17 @@ export class Product {
   size: string;
 
   @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
   ingredients?: string;
 
   @Field({ nullable: true })
-  origin: string;
+  origin?: string;
 
   @Field(() => [ImageUrl])
   imageUrls: ImageUrl[];
+
+  @Field(() => [Int])
+  categoryIds: number[];
 }

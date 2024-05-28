@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import algoliasearch, { SearchClient, SearchIndex } from 'algoliasearch';
+import { SearchedProductDto } from 'src/product/dto/searched-product.dto';
 import { Product } from 'src/product/entities/product.entity.js';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AlgoliaService {
   }
 
   async searchProducts(searchTerm: string) {
-    const { hits } = await this.index.search<Product>(searchTerm);
+    const { hits } = await this.index.search<SearchedProductDto>(searchTerm);
     return hits;
   }
 }

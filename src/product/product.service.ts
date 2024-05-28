@@ -20,7 +20,22 @@ export class ProductService {
   }
 
   async searchProducts(searchTerm: string): Promise<Product[]> {
-    const searchResults = await this.algoliaService.searchProducts(searchTerm);
-    return searchResults;
+    const searchResultsDto =
+      await this.algoliaService.searchProducts(searchTerm);
+    const searchResult: Product[] = searchResultsDto.map((p) => ({
+      id: p.id,
+      name: p.name,
+      brand: p.brand,
+      price: p.price,
+      size: p.size,
+      imageUrls: [
+        {
+          thumbnail: p.imageThumbnail,
+          small: p.imageGallery,
+        },
+      ],
+      categoryIds: p.categoryIds,
+    }));
+    return searchResult;
   }
 }
