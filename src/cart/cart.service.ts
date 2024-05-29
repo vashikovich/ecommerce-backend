@@ -1,18 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Cart } from './entities/cart.entity';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CartService {
   private db: FirebaseFirestore.Firestore;
   private collection: FirebaseFirestore.CollectionReference;
 
-  constructor(private firebaseAdminService: FirebaseService) {
+  constructor(
+    private firebaseAdminService: FirebaseService,
+    private productService: ProductService,
+  ) {
     this.db = this.firebaseAdminService.getFirestore();
     this.collection = this.db.collection('carts');
   }
 
-  async createCartIfNotExist(userId: string): Promise<Cart> {
+  private async createCartIfNotExist(userId: string): Promise<Cart> {
     const cartRef = this.collection.doc();
     const newCart: Cart = {
       userId,
@@ -24,7 +28,11 @@ export class CartService {
 
   async getCartByUserId(userId: string): Promise<Cart> {
     const doc = await this.collection.doc(userId).get();
-    return doc.data() as Cart;
+    const cart = (doc.data() as Cart) ?? {
+      userId,
+      items: [],
+    };
+    return cart;
   }
 
   async addProductToCart(userId: string, productId: string): Promise<Cart> {
@@ -38,11 +46,19 @@ export class CartService {
       cart = await this.createCartIfNotExist(userId);
     }
 
+    const product = await this.productService.getProductById(productId);
+
     const item = cart.items.find((i) => i.productId === productId);
     if (item) {
       item.quantity++;
+      if (item.quantity > product.stock) {
+        throw new BadRequestException('Product stock is not sufficient');
+      }
     } else {
       cart.items.push({ productId, quantity: 1 });
+      if (product.stock < 1) {
+        throw new BadRequestException('Product stock is not sufficient');
+      }
     }
 
     await collection.doc(userId).set(cart);
@@ -58,9 +74,14 @@ export class CartService {
     const collection = this.collection;
     const doc = await collection.doc(userId).get();
 
+    const product = await this.productService.getProductById(productId);
+
     const cart = doc.data() as Cart;
     const item = cart.items.find((i) => i.productId === productId);
     item.quantity = quantity;
+    if (item.quantity > product.stock) {
+      throw new BadRequestException('Product stock is not sufficient');
+    }
 
     await collection.doc(userId).set(cart);
 

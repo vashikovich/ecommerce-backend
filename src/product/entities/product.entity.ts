@@ -29,6 +29,9 @@ export class Product {
   @Field()
   size: string;
 
+  @Field(() => Int)
+  stock?: number;
+
   @Field({ nullable: true })
   description?: string;
 

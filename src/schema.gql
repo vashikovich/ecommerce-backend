@@ -14,6 +14,7 @@ type Product {
   brand: String
   price: Float!
   size: String!
+  stock: Int!
   description: String
   ingredients: String
   origin: String
@@ -23,12 +24,14 @@ type Product {
 
 type CartItem {
   productId: String!
+  product: Product
   quantity: Int!
 }
 
 type Cart {
   userId: String!
   items: [CartItem!]!
+  product: [Product!]!
 }
 
 type User {
