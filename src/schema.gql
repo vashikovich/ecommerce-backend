@@ -31,7 +31,6 @@ type CartItem {
 type Cart {
   userId: String!
   items: [CartItem!]!
-  product: [Product!]!
 }
 
 type User {
@@ -58,6 +57,22 @@ type Order {
   status: String!
 }
 
+type Subcategory {
+  id: Int!
+  name: String!
+  image: String!
+}
+
+type Category {
+  id: Int!
+  name: String!
+  subcategories: [Subcategory!]!
+}
+
+type Metadata {
+  categories: [Category!]!
+}
+
 type Query {
   currentUser: User!
   product(id: String!): Product!
@@ -65,6 +80,7 @@ type Query {
   cart: Cart!
   order(id: String!): Order!
   ordersByUser: [Order!]!
+  metadata: Metadata!
 }
 
 type Mutation {

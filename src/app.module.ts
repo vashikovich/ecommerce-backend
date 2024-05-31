@@ -7,6 +7,7 @@ import { OrderModule } from './order/order.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module.js';
+import { MetadataModule } from './metadata/metadata.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module.js';
     ProductModule,
     CartModule,
     OrderModule,
+    MetadataModule,
   ],
 })
 export class AppModule {}
