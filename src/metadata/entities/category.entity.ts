@@ -9,6 +9,9 @@ export class Category {
   @Field()
   name: string;
 
+  @Field()
+  image: string;
+
   @Field(() => [Subcategory])
   subcategories: Subcategory[];
 }
