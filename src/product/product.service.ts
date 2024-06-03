@@ -19,7 +19,7 @@ export class ProductService {
     return { id: doc.id, ...doc.data() } as Product;
   }
 
-  async searchProducts(searchTerm: string): Promise<Product[]> {
+  async searchProductsByTerm(searchTerm: string): Promise<Product[]> {
     const searchResultsDto =
       await this.algoliaService.searchProducts(searchTerm);
     const searchResult: Product[] = searchResultsDto.map((p) => ({
@@ -36,6 +36,17 @@ export class ProductService {
       ],
       categoryIds: p.categoryIds,
     }));
+    return searchResult;
+  }
+
+  async searchProductsByCategory(categoryId: number): Promise<Product[]> {
+    const query = await this.db
+      .collection('products')
+      .where('categoryIds', 'array-contains', categoryId)
+      .get();
+    const searchResult: Product[] = query.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() }) as Product,
+    );
     return searchResult;
   }
 }

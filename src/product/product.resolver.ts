@@ -12,7 +12,14 @@ export class ProductResolver {
   }
 
   @Query(() => [Product])
-  async searchProducts(@Args('searchTerm') searchTerm: string) {
-    return this.productService.searchProducts(searchTerm);
+  async searchProducts(
+    @Args('searchTerm', { nullable: true }) searchTerm?: string,
+    @Args('categoryId', { nullable: true }) categoryId?: number,
+  ) {
+    if (searchTerm) {
+      return this.productService.searchProductsByTerm(searchTerm);
+    } else {
+      return this.productService.searchProductsByCategory(categoryId);
+    }
   }
 }
