@@ -13,7 +13,7 @@ export class ProductEdge {
 
 @ObjectType()
 export class PaginatedProduct {
-  @Field(() => [ProductEdge], { nullable: true })
+  @Field(() => [ProductEdge])
   edges: ProductEdge[];
 
   @Field(() => PageInfo, { nullable: true })

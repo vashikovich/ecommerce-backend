@@ -8,7 +8,7 @@ export class ImageUrl {
   @Field()
   small: string;
 
-  @Field()
+  @Field({ nullable: true })
   original?: string;
 }
 

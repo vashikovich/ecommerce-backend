@@ -5,7 +5,7 @@
 type ImageUrl {
   thumbnail: String!
   small: String!
-  original: String!
+  original: String
 }
 
 type Product {
@@ -34,7 +34,7 @@ type ProductEdge {
 }
 
 type PaginatedProduct {
-  edges: [ProductEdge!]
+  edges: [ProductEdge!]!
   pageInfo: PageInfo
 }
 
