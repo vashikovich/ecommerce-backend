@@ -28,14 +28,14 @@ type PageInfo {
   hasNextPage: Boolean!
 }
 
-type PaginatedProduct {
-  edges: [ProductEdge!]
-  pageInfo: PageInfo
-}
-
 type ProductEdge {
   cursor: String!
   node: Product!
+}
+
+type PaginatedProduct {
+  edges: [ProductEdge!]
+  pageInfo: PageInfo
 }
 
 type CartItem {
