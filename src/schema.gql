@@ -22,6 +22,22 @@ type Product {
   categoryIds: [Int!]!
 }
 
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+type PaginatedProduct {
+  edges: [ProductEdge!]
+  pageInfo: PageInfo
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
 type CartItem {
   productId: String!
   product: Product
@@ -77,7 +93,8 @@ type Metadata {
 type Query {
   currentUser: User!
   product(id: String!): Product!
-  searchProducts(searchTerm: String, categoryId: Float): [Product!]!
+  searchProductsByTerm(searchTerm: String!, first: Int, after: String): PaginatedProduct!
+  searchProductsByCategory(categoryId: Int!, first: Int, after: String): PaginatedProduct!
   cart: Cart!
   order(id: String!): Order!
   ordersByUser: [Order!]!
@@ -87,7 +104,7 @@ type Query {
 type Mutation {
   updateUser(input: UpdateUserInput!): User!
   addProductToCart(productId: String!): Cart!
-  changeCartProductQuantity(productId: String!, quantity: Float!): Cart!
+  changeCartProductQuantity(productId: String!, quantity: Int!): Cart!
   createOrder: Order!
 }
 

@@ -15,8 +15,19 @@ export class AlgoliaService {
     this.index = this.client.initIndex('e-commerce_products');
   }
 
-  async searchProducts(searchTerm: string) {
-    const { hits } = await this.index.search<SearchedProductDto>(searchTerm);
+  async searchProducts({
+    searchTerm,
+    offset,
+    length,
+  }: {
+    searchTerm: string;
+    offset: number;
+    length: number;
+  }) {
+    const { hits } = await this.index.search<SearchedProductDto>(searchTerm, {
+      offset,
+      length,
+    });
     return hits;
   }
 }

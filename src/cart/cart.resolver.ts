@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Int } from '@nestjs/graphql';
 import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
 import { User } from 'src/user/entities/user.entity';
@@ -30,7 +30,7 @@ export class CartResolver {
   async changeCartProductQuantity(
     @CurrentUser() user: User,
     @Args('productId') productId: string,
-    @Args('quantity') quanity: number,
+    @Args('quantity', { type: () => Int }) quanity: number,
   ) {
     return await this.cartService.changeCartProductQuantity(
       user.id,
