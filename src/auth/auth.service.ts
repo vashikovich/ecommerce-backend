@@ -1,10 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { TokenInfoOutput } from './dto/token-info.output';
 import { EmailService } from 'src/email/email.service';
 import { User } from 'src/user/entities/user.entity';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +27,9 @@ export class AuthService {
 
     await this.emailService.sendEmail(email, 'SIGN_UP', null);
 
+    delete user.passwordHash;
+    delete user.refreshTokenHash;
+
     return user;
   }
 
@@ -30,13 +38,17 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return this.createToken(user);
+    const tokenInfo = this.createToken(user);
+    await this.updateRefreshToken(user.id, tokenInfo.refreshToken);
+
+    return tokenInfo;
   }
 
   private createToken(user: User): TokenInfoOutput {
     const payload = { email: user.email, sub: user.id };
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
+      refreshToken: this.jwtService.sign(payload, { expiresIn: '30d' }),
     };
   }
 
@@ -47,9 +59,40 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
+
+      delete user.passwordHash;
+      delete user.refreshTokenHash;
+
       return user;
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  async logout(userId: string) {
+    await this.userService.updateUser(userId, {
+      refreshTokenHash: null,
+    });
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashedToken = await argon2.hash(refreshToken);
+    await this.userService.updateUser(userId, {
+      refreshTokenHash: hashedToken,
+    });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.userService.findById(userId);
+    if (!user || !user.refreshTokenHash)
+      throw new ForbiddenException('Access Denied');
+    const refreshTokenMatches = await argon2.verify(
+      user.refreshTokenHash,
+      refreshToken,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
+    const tokenInfo = this.createToken(user);
+    await this.updateRefreshToken(userId, tokenInfo.refreshToken);
+    return tokenInfo;
   }
 }

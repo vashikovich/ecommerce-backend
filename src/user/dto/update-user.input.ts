@@ -4,4 +4,6 @@ import { Field, InputType } from '@nestjs/graphql';
 export class UpdateUserInput {
   @Field()
   displayName?: string;
+
+  refreshTokenHash?: string;
 }

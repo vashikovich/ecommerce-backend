@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 
 @Injectable()
-export class GraphqlAuthGuard extends AuthGuard('jwt') {
+export class JwtGuard extends AuthGuard('jwt') {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

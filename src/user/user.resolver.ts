@@ -3,7 +3,7 @@ import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { UpdateUserInput } from './dto/update-user.input';
-import { GraphqlAuthGuard } from 'src/auth/guards/graphql-auth.guard';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from './decorators/user.decorator';
 
@@ -12,14 +12,14 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => User)
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(JwtGuard)
   async currentUser(@CurrentUser() user: User) {
     delete user.passwordHash;
     return user;
   }
 
   @Mutation(() => User)
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(JwtGuard)
   async updateUser(
     @CurrentUser() user: User,
     @Args('input') input: UpdateUserInput,

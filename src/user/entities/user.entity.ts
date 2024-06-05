@@ -11,6 +11,8 @@ export class User {
 
   passwordHash?: string;
 
+  refreshTokenHash?: string;
+
   @Field({ nullable: true })
   displayName?: string;
 }

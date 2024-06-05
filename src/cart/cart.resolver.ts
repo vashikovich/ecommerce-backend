@@ -3,7 +3,7 @@ import { Cart } from './entities/cart.entity';
 import { CartService } from './cart.service';
 import { User } from 'src/user/entities/user.entity';
 import { UseGuards } from '@nestjs/common';
-import { GraphqlAuthGuard } from 'src/auth/guards/graphql-auth.guard';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { CurrentUser } from 'src/user/decorators/user.decorator';
 
 @Resolver(() => Cart)
@@ -11,13 +11,13 @@ export class CartResolver {
   constructor(private cartService: CartService) {}
 
   @Query(() => Cart)
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(JwtGuard)
   async cart(@CurrentUser() user: User) {
     return this.cartService.getCartByUserId(user.id);
   }
 
   @Mutation(() => Cart)
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(JwtGuard)
   async addProductToCart(
     @CurrentUser() user: User,
     @Args('productId') productId: string,
@@ -26,7 +26,7 @@ export class CartResolver {
   }
 
   @Mutation(() => Cart)
-  @UseGuards(GraphqlAuthGuard)
+  @UseGuards(JwtGuard)
   async changeCartProductQuantity(
     @CurrentUser() user: User,
     @Args('productId') productId: string,
