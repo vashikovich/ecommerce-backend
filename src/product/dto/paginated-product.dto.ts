@@ -30,6 +30,12 @@ class CategoryFacet {
 
 @ObjectType()
 class PageInfo {
+  @Field()
+  hasMore: boolean;
+}
+
+@ObjectType()
+class SearchInfo {
   @Field(() => Int)
   total: number;
 
@@ -47,4 +53,7 @@ export class PaginatedProduct {
 
   @Field(() => PageInfo)
   pageInfo: PageInfo;
+
+  @Field(() => SearchInfo)
+  searchInfo: SearchInfo;
 }

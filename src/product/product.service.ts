@@ -48,7 +48,7 @@ export class ProductService {
     { first = 10, after }: PaginationArgs,
   ): Promise<PaginatedProduct> {
     const cursor = after ? cursorUtils.decode<{ offset: number }>(after) : null;
-    const offset = cursor?.offset ? cursor.offset + 1 : 0;
+    const offset = cursor?.offset ? cursor.offset : 0;
 
     let indexName: AlgoliaIndex;
     switch (sortBy) {
@@ -91,32 +91,37 @@ export class ProductService {
       filters,
       facets: ['brand', 'categoryIds'],
       offset,
-      length: first,
+      length: first + 2,
     });
 
+    const edges = results.hits.map((p) => ({
+      node: {
+        id: p.id,
+        name: p.name,
+        brand: p.brand,
+        price: p.price,
+        size: p.size,
+        local: p.local,
+        peak: p.peak,
+        imageUrls: [
+          {
+            thumbnail: p.imageThumbnail,
+            small: p.imageGallery,
+          },
+        ],
+        categoryIds: p.categoryIds,
+      },
+      cursor: cursorUtils.encode({
+        offset: offset + results.hits.indexOf(p),
+      }),
+    }));
+
+    const slicedEdges =
+      offset > 0 ? edges.slice(1, first + 1) : edges.slice(0, first);
+
     const paginatedResult: PaginatedProduct = {
-      edges: results.hits.map((p) => ({
-        node: {
-          id: p.id,
-          name: p.name,
-          brand: p.brand,
-          price: p.price,
-          size: p.size,
-          local: p.local,
-          peak: p.peak,
-          imageUrls: [
-            {
-              thumbnail: p.imageThumbnail,
-              small: p.imageGallery,
-            },
-          ],
-          categoryIds: p.categoryIds,
-        },
-        cursor: cursorUtils.encode({
-          offset: offset + results.hits.indexOf(p),
-        }),
-      })),
-      pageInfo: {
+      edges: slicedEdges,
+      searchInfo: {
         total: results.nbHits,
         availableBrands: results.facets['brand']
           ? Object.keys(results.facets['brand']).map((k) => ({
@@ -130,6 +135,9 @@ export class ProductService {
               count: results.facets['categoryIds'][k],
             }))
           : [],
+      },
+      pageInfo: {
+        hasMore: slicedEdges.slice(-1)[0]?.cursor != edges.slice(-1)[0]?.cursor,
       },
     };
     return paginatedResult;

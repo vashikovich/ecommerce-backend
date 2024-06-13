@@ -40,6 +40,10 @@ type CategoryFacet {
 }
 
 type PageInfo {
+  hasMore: Boolean!
+}
+
+type SearchInfo {
   total: Int!
   availableBrands: [BrandFacet!]!
   availableCategories: [CategoryFacet!]!
@@ -48,6 +52,7 @@ type PageInfo {
 type PaginatedProduct {
   edges: [ProductEdge!]!
   pageInfo: PageInfo!
+  searchInfo: SearchInfo!
 }
 
 type CartItem {
