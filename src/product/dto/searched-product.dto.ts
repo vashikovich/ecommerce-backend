@@ -4,6 +4,8 @@ export class SearchedProductDto {
   brand?: string;
   price: number;
   size: string;
+  local: boolean;
+  peak: boolean;
   imageThumbnail: string;
   imageGallery: string;
   categoryIds: number[];

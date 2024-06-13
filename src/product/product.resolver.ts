@@ -1,8 +1,9 @@
-import { Resolver, Query, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Args } from '@nestjs/graphql';
 import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
 import { PaginatedProduct } from './dto/paginated-product.dto';
-import { PaginationArgs } from 'src/common/pagination-args';
+import { SearchProductsInput } from './dto/search-params.input';
+import { PaginationArgs } from 'src/common/dto/pagination.args';
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -14,19 +15,10 @@ export class ProductResolver {
   }
 
   @Query(() => PaginatedProduct)
-  async searchProductsByTerm(
-    @Args('searchTerm') searchTerm: string,
+  async searchProducts(
+    @Args('input') input: SearchProductsInput,
     @Args() pagination: PaginationArgs,
   ): Promise<PaginatedProduct> {
-    return this.productService.searchProductsByTerm(searchTerm, pagination);
-  }
-
-  @Query(() => PaginatedProduct)
-  async searchProductsByCategory(
-    @Args('categoryId', { type: () => Int })
-    categoryId: number,
-    @Args() pagination: PaginationArgs,
-  ): Promise<PaginatedProduct> {
-    return this.productService.searchProductsByCategory(categoryId, pagination);
+    return this.productService.searchProducts(input, pagination);
   }
 }

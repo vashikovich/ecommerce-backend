@@ -29,8 +29,14 @@ export class Product {
   @Field()
   size: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   stock?: number;
+
+  @Field()
+  local: boolean;
+
+  @Field()
+  peak: boolean;
 
   @Field({ nullable: true })
   description?: string;

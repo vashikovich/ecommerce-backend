@@ -14,7 +14,9 @@ type Product {
   brand: String
   price: Float!
   size: String!
-  stock: Int!
+  stock: Int
+  local: Boolean!
+  peak: Boolean!
   description: String
   ingredients: String
   origin: String
@@ -22,20 +24,30 @@ type Product {
   categoryIds: [Int!]!
 }
 
-type PageInfo {
-  startCursor: String
-  endCursor: String
-  hasNextPage: Boolean!
-}
-
 type ProductEdge {
   cursor: String!
   node: Product!
 }
 
+type BrandFacet {
+  brand: String!
+  count: Int!
+}
+
+type CategoryFacet {
+  categoryId: Int!
+  count: Int!
+}
+
+type PageInfo {
+  total: Int!
+  availableBrands: [BrandFacet!]!
+  availableCategories: [CategoryFacet!]!
+}
+
 type PaginatedProduct {
   edges: [ProductEdge!]!
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
 }
 
 type CartItem {
@@ -93,12 +105,30 @@ type Metadata {
 type Query {
   currentUser: User!
   product(id: String!): Product!
-  searchProductsByTerm(searchTerm: String!, first: Int, after: String): PaginatedProduct!
-  searchProductsByCategory(categoryId: Int!, first: Int, after: String): PaginatedProduct!
+  searchProducts(input: SearchProductsInput!, first: Int, after: String): PaginatedProduct!
   cart: Cart!
   order(id: String!): Order!
   ordersByUser: [Order!]!
   metadata: Metadata!
+}
+
+input SearchProductsInput {
+  searchTerm: String
+  sortBy: ProductSortType
+  filterBy: ProductFilterInput
+  brandFilter: [String!]
+  categoryFilter: [Int!]
+}
+
+enum ProductSortType {
+  Relevance
+  PriceAsc
+  PriceDesc
+}
+
+input ProductFilterInput {
+  peak: Boolean
+  local: Boolean
 }
 
 type Mutation {
