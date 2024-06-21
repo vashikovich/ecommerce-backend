@@ -87,6 +87,7 @@ type Order {
   userId: String!
   items: [OrderItem!]!
   totalAmount: Float!
+  date: String!
   status: String!
 }
 
@@ -138,7 +139,6 @@ input ProductFilterInput {
 
 type Mutation {
   updateUser(input: UpdateUserInput!): User!
-  addProductToCart(productId: String!): Cart!
   changeCartProductQuantity(productId: String!, quantity: Int!): Cart!
   createOrder: Order!
 }

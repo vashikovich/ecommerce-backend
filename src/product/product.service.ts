@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../firebase/firebase.service';
 import { ImageUrl, Product } from './entities/product.entity';
-import { cursorUtils } from 'src/common/utils';
+import { base64 } from 'src/common/utils';
 import { PaginatedProduct } from './dto/paginated-product.dto';
 import { AlgoliaService } from 'src/algolia/algolia.service';
 import {
@@ -25,6 +25,11 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product> {
     const doc = await this.db.collection('products').doc(id).get();
+
+    if (!doc.exists) {
+      throw 'No product found with the specified ID';
+    }
+
     const data = doc.data();
     const imageUrls = [] as ImageUrl[];
     for (let i = 0; i < data.imagesGallery.length; i++) {
@@ -47,7 +52,7 @@ export class ProductService {
     }: SearchProductsInput,
     { first = 10, after }: PaginationArgs,
   ): Promise<PaginatedProduct> {
-    const cursor = after ? cursorUtils.decode<{ offset: number }>(after) : null;
+    const cursor = after ? base64.decode<{ offset: number }>(after) : null;
     const offset = cursor?.offset ? cursor.offset : 0;
 
     let indexName: AlgoliaIndex;
@@ -101,6 +106,7 @@ export class ProductService {
         brand: p.brand,
         price: p.price,
         size: p.size,
+        stock: p.stock,
         local: p.local,
         peak: p.peak,
         imageUrls: [
@@ -111,7 +117,7 @@ export class ProductService {
         ],
         categoryIds: p.categoryIds,
       },
-      cursor: cursorUtils.encode({
+      cursor: base64.encode({
         offset: offset + results.hits.indexOf(p),
       }),
     }));

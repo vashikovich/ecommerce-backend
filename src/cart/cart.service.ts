@@ -16,8 +16,8 @@ export class CartService {
     this.collection = this.db.collection('carts');
   }
 
-  private async createCartIfNotExist(userId: string): Promise<Cart> {
-    const cartRef = this.collection.doc();
+  async resetCart(userId: string): Promise<Cart> {
+    const cartRef = this.collection.doc(userId);
     const newCart: Cart = {
       userId,
       items: [],
@@ -35,37 +35,6 @@ export class CartService {
     return cart;
   }
 
-  async addProductToCart(userId: string, productId: string): Promise<Cart> {
-    const collection = this.collection;
-    const doc = await collection.doc(userId).get();
-
-    let cart: Cart;
-    if (doc.exists) {
-      cart = doc.data() as Cart;
-    } else {
-      cart = await this.createCartIfNotExist(userId);
-    }
-
-    const product = await this.productService.getProductById(productId);
-
-    const item = cart.items.find((i) => i.productId === productId);
-    if (item) {
-      item.quantity++;
-      if (item.quantity > product.stock) {
-        throw new BadRequestException('Product stock is not sufficient');
-      }
-    } else {
-      cart.items.push({ productId, quantity: 1 });
-      if (product.stock < 1) {
-        throw new BadRequestException('Product stock is not sufficient');
-      }
-    }
-
-    await collection.doc(userId).set(cart);
-
-    return cart;
-  }
-
   async changeCartProductQuantity(
     userId: string,
     productId: string,
@@ -76,11 +45,20 @@ export class CartService {
 
     const product = await this.productService.getProductById(productId);
 
-    const cart = doc.data() as Cart;
+    const cart = doc.exists
+      ? (doc.data() as Cart)
+      : await this.resetCart(userId);
     const item = cart.items.find((i) => i.productId === productId);
-    item.quantity = quantity;
-    if (item.quantity > product.stock) {
+    if (quantity > product.stock) {
       throw new BadRequestException('Product stock is not sufficient');
+    }
+
+    if (!item) {
+      cart.items.push({ productId, quantity });
+    } else if (quantity == 0) {
+      cart.items = cart.items.filter((i) => i.productId !== productId);
+    } else {
+      item.quantity = quantity;
     }
 
     await collection.doc(userId).set(cart);

@@ -4,6 +4,7 @@ export class SearchedProductDto {
   brand?: string;
   price: number;
   size: string;
+  stock: number;
   local: boolean;
   peak: boolean;
   imageThumbnail: string;

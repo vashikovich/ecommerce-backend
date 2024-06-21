@@ -39,5 +39,8 @@ export class Order {
   totalAmount: number;
 
   @Field()
+  date: string;
+
+  @Field()
   status: string;
 }

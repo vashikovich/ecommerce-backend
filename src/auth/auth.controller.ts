@@ -4,6 +4,9 @@ import {
   Body,
   ValidationPipe,
   UseGuards,
+  Get,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -11,6 +14,9 @@ import { LoginDto } from './dto/login.dto';
 import { JwtGuard } from './guards/jwt.guard';
 import { CurrentUser } from 'src/user/decorators/user.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { GoogleGuard } from './guards/google.guard';
+import { base64 } from 'src/common/utils';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -48,5 +54,19 @@ export class AuthController {
     );
     const user = await this.authService.getUserFromToken(tokenInfo.accessToken);
     return { user, tokenInfo };
+  }
+
+  @Get('google')
+  @UseGuards(GoogleGuard)
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleGuard)
+  async googleAuthRedirect(@Req() req: any, @Res() res: Response) {
+    const { username } = req.user;
+    const tokenInfo = await this.authService.loginViaProvider(username);
+    const user = await this.authService.getUserFromToken(tokenInfo.accessToken);
+    const code = base64.encode({ user, tokenInfo });
+    res.redirect(`${process.env.WEB_HOST}/user/login/provider?code=${code}`);
   }
 }

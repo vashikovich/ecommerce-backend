@@ -14,13 +14,16 @@ export class UserService {
     this.collection = db.collection('users');
   }
 
-  async createUser(email: string, password: string): Promise<User> {
-    const passwordHash = await bcrypt.hash(password, 10);
+  async createUser(email: string, password?: string): Promise<User> {
     const user: User = {
       id: uuidv4(),
       email,
-      passwordHash,
     };
+
+    if (password !== undefined) {
+      user.passwordHash = await bcrypt.hash(password, 10);
+    }
+
     const doc = this.collection.doc(user.id);
     await doc.set(user);
     return user;

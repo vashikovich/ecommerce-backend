@@ -18,24 +18,15 @@ export class CartResolver {
 
   @Mutation(() => Cart)
   @UseGuards(JwtGuard)
-  async addProductToCart(
-    @CurrentUser() user: User,
-    @Args('productId') productId: string,
-  ) {
-    return await this.cartService.addProductToCart(user.id, productId);
-  }
-
-  @Mutation(() => Cart)
-  @UseGuards(JwtGuard)
   async changeCartProductQuantity(
     @CurrentUser() user: User,
     @Args('productId') productId: string,
-    @Args('quantity', { type: () => Int }) quanity: number,
+    @Args('quantity', { type: () => Int }) quantity: number,
   ) {
     return await this.cartService.changeCartProductQuantity(
       user.id,
       productId,
-      quanity,
+      quantity,
     );
   }
 }

@@ -1,4 +1,4 @@
-export const cursorUtils = {
+export const base64 = {
   encode(input: any) {
     return Buffer.from(JSON.stringify(input)).toString('base64');
   },

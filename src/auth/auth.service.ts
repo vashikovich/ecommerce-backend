@@ -24,8 +24,7 @@ export class AuthService {
     if (existing) throw new UnauthorizedException('Email already registered');
 
     const user = await this.userService.createUser(email, password);
-
-    await this.emailService.sendEmail(email, 'SIGN_UP', null);
+    await this.emailService.sendEmail(email, 'SIGN_UP', { email });
 
     delete user.passwordHash;
     delete user.refreshTokenHash;
@@ -35,6 +34,11 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
+
+    if (user && user.passwordHash === undefined) {
+      throw new UnauthorizedException('Please sign in using providers');
+    }
+
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -44,10 +48,29 @@ export class AuthService {
     return tokenInfo;
   }
 
+  async loginViaProvider(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (user) {
+      const tokenInfo = this.createToken(user);
+      await this.updateRefreshToken(user.id, tokenInfo.refreshToken);
+
+      return tokenInfo;
+    } else {
+      const newUser = await this.userService.createUser(email);
+      await this.emailService.sendEmail(email, 'SIGN_UP', { email });
+
+      const tokenInfo = this.createToken(newUser);
+      await this.updateRefreshToken(newUser.id, tokenInfo.refreshToken);
+
+      return tokenInfo;
+    }
+  }
+
   private createToken(user: User): TokenInfoOutput {
     const payload = { email: user.email, sub: user.id };
     return {
-      accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
+      accessToken: this.jwtService.sign(payload, { expiresIn: '1m' }),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '30d' }),
     };
   }
